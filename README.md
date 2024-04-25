@@ -1,0 +1,1 @@
+# LenovoBIOSSettings-IntuneRemediation
