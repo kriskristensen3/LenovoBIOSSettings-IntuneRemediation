@@ -88,6 +88,15 @@ Function Change-LenovoBIOSSetting{
             Write-Host "Compliant" -ForegroundColor Green
         }
     }
+    #Connect to the Lenovo_SaveBiosSetting WMI class
+    $SaveSettings = Get-WmiObject -Namespace root\wmi -Class Lenovo_SaveBiosSettings
+    If(Check-LenovoBIOSPassword){
+        #Save any outstanding BIOS configuration changes (password set)
+        $SaveSettings.SaveBiosSettings("$($Password),ascii,us")
+    }else{
+        #Save any outstanding BIOS configuration changes (no password set)
+        $SaveSettings.SaveBiosSettings()
+    }
 
 }
 
@@ -98,9 +107,4 @@ If(Check-ForLenovoDevice){
     Exit 1
 }
 
-Change-LenovoBIOSSetting -Settings "UserPresenceSensing,Disable" -Password "password"
-
-Change-LenovoBIOSSetting -Settings "UserPresenceSensing,Disable"
-
-Change-LenovoBIOSSetting -Settings "https://test.blob.core.windows.net/config/LenovoBIOSSettings.txt" -Password "password" -URL
-Change-LenovoBIOSSetting -Settings "https://test.blob.core.windows.net/config/LenovoBIOSSettings.txt" -URL
+Change-LenovoBIOSSetting -Settings "UserPresenceSensing,Disable" -Password "Password"
