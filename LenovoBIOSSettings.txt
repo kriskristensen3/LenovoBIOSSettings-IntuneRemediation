@@ -1,0 +1,17 @@
+AdaptiveThermalManagementAC,MaximizePerformance
+HyperThreadingTechnology,Enable
+SecurityChip,Enable
+TXTFeature,Enable
+VirtualizationTechnology,Enable
+VTdFeature,Enable
+SecureBoot,Enable
+DeviceGuard,Enable
+BootMode,Quick
+LenovoCloudServices,Disable
+PCIeTunneling,Enable
+AMTControl,Disable
+EnhancedWindowsBiometricSecurity,Enable
+BottomCoverTamperDetected,Enable
+TotalMemoryEncryption,Enable
+KeyboardLayout,English_US
+UserPresenceSensing,Disable
