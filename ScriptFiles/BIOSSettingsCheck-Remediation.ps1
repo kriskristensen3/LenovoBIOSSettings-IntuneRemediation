@@ -2,15 +2,80 @@ Write-Host "LenovoBios setting check"
 Set-Variable -Name countNotcompliant -Value 0 -Scope Global
 Set-Variable -Name "NotcompliantBIOSNames" -Value $null -Scope Global 
 
+#region Check-ForLenovoDevice
 Function Check-ForLenovoDevice {
+<#
+.SYNOPSIS
+
+Check Manufacturer in WMI
+
+.DESCRIPTION
+
+Get the Manufacturer data from WMI and check if its a Lenovo
+
+.PARAMETER
+
+None
+
+.INPUTS
+
+None
+
+.OUTPUTS
+
+Boolean
+
+.EXAMPLE
+
+Check-ForLenovoDevice
+
+.NOTES
+
+.LINK
+
+https://github.com/kriskristensen3/LenovoBIOSSettings-IntuneRemediation/
+#>
     If((Get-WmiObject -Class Win32_ComputerSystem -Property Manufacturer).Manufacturer -EQ "LENOVO"){
         return $true
     }else{
         return $false
     }
 }
+#endregion
 
+#region Check-LenovoBIOSSetting
 Function Check-LenovoBIOSSetting {
+<#
+.SYNOPSIS
+
+Check if the BIOS setting exist in BIOS
+
+.DESCRIPTION
+
+Get the BIOS setting data from WMI and check if it exist
+
+.PARAMETER Name
+
+Name of a BIOS setting "UserPresenceSensing"
+
+.INPUTS
+
+None
+
+.OUTPUTS
+
+Boolean
+
+.EXAMPLE
+
+Check-LenovoBIOSSetting
+
+.NOTES
+
+.LINK
+
+https://github.com/kriskristensen3/LenovoBIOSSettings-IntuneRemediation/
+#>
     Param(
         [Parameter(Mandatory = $true)]
         [string]$Name
@@ -19,24 +84,132 @@ Function Check-LenovoBIOSSetting {
     return (gwmi -class Lenovo_BiosSetting -namespace root\wmi | Where-Object {$_.CurrentSetting.split(",",[StringSplitOptions]::RemoveEmptyEntries) -eq "$Name"}).CurrentSetting
 
 }
+#endregion
 
+#region Check-LenovoBIOSPassword
 Function Check-LenovoBIOSPassword {
+<#
+.SYNOPSIS
+
+Check if password is set in the BIOS
+
+.DESCRIPTION
+
+Get the BIOS data from WMI and check if a password is set
+
+.PARAMETER
+
+None
+
+.INPUTS
+
+None
+
+.OUTPUTS
+
+Boolean
+
+.EXAMPLE
+
+Check-LenovoBIOSPassword
+
+.NOTES
+
+.LINK
+
+https://github.com/kriskristensen3/LenovoBIOSSettings-IntuneRemediation/
+#>
     If((Get-CimInstance -Namespace root/WMI -ClassName Lenovo_BiosPasswordSettings).PasswordState -eq 0){
         return $false
     }else{
         return $true
     }
 }
+#endregion
 
+#region Get-LenovoBIOSSetting
 Function Get-LenovoBIOSSetting{
+<#
+.SYNOPSIS
+
+Get settings from the BIOS with state
+
+.DESCRIPTION
+
+Get settings from the BIOS with state form WMI
+
+.PARAMETER Name
+
+Name of a BIOS setting "UserPresenceSensing"
+
+.INPUTS
+
+None
+
+.OUTPUTS
+
+Setting with state
+
+.EXAMPLE
+
+Get-LenovoBIOSSetting
+
+.NOTES
+
+.LINK
+
+https://github.com/kriskristensen3/LenovoBIOSSettings-IntuneRemediation/
+#>
     Param(
         [Parameter(Mandatory = $true)]
         [string]$Name
     )
     return (gwmi -class Lenovo_BiosSetting -namespace root\wmi | Where-Object {$_.CurrentSetting.split(",",[StringSplitOptions]::RemoveEmptyEntries) -eq "$Name"}).CurrentSetting
 }
+#endregion
 
+#region Change-LenovoBIOSSetting
 Function Change-LenovoBIOSSetting{
+<#
+.SYNOPSIS
+
+Get settings from the BIOS with state
+
+.DESCRIPTION
+
+Get settings from the BIOS with state form WMI
+
+.PARAMETER Password
+
+Name of a BIOS setting "UserPresenceSensing"
+
+.PARAMETER Settings
+
+Name of a BIOS setting with state "UserPresenceSensing"
+Or URL if the -URL is add to the command
+
+.PARAMETER URL
+
+Switch if enabled the Settings parameter will be able to take URL
+
+.INPUTS
+
+None
+
+.OUTPUTS
+
+None
+
+.EXAMPLE
+
+Change-LenovoBIOSSetting
+
+.NOTES
+
+.LINK
+
+https://github.com/kriskristensen3/LenovoBIOSSettings-IntuneRemediation/
+#>
     param(
         [String]$Password,
         [Parameter(Mandatory = $true)]
@@ -99,6 +272,7 @@ Function Change-LenovoBIOSSetting{
     }
 
 }
+#endregion
 
 If(Check-ForLenovoDevice){
     Write-Host "Compliant device" -ForegroundColor Green
@@ -107,4 +281,6 @@ If(Check-ForLenovoDevice){
     Exit 1
 }
 
-Change-LenovoBIOSSetting -Settings "UserPresenceSensing,Disable" -Password "Password"
+Change-LenovoBIOSSetting -Settings "UserPresenceSensing,Disable" -Password "password"
+
+Change-LenovoBIOSSetting -Settings "https://test.blob.core.windows.net/config/LenovoBIOSSettings.txt" -Password "password" -URL
